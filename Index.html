@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#1e3a5f">
+  <title>Ride Optimizer</title>
+  <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIlJpZGUgT3B0aW1pemVyIiwKICAic2hvcnRfbmFtZSI6ICJSaWRlcyIsCiAgImRlc2NyaXB0aW9uIjogIlJlYWwtdGltZSB0aGVtZSBwYXJrIHJpZGUgb3B0aW1pemVyIiwKICAic3RhcnRfdXJsIjogIi4vaW5kZXguaHRtbCIsCiAgImRpc3BsYXkiOiAic3RhbmRhbG9uZSIsCiAgImJhY2tncm91bmRfY29sb3IiOiAiI2YwZjJmNSIsCiAgInRoZW1lX2NvbG9yIjogIiMxZTNhNWYiLAogICJvcmllbnRhdGlvbiI6ICJwb3J0cmFpdCIsCiAgImljb25zIjogW3sKICAgICJzcmMiOiAiZGF0YTppbWFnZS9zdmcreG1sLDxzdmcgeG1sbnM9J2h0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnJyB2aWV3Qm94PScwIDAgNTEyIDUxMic+PHJlY3QgZmlsbD0nJTIzMjU2M2ViJyB3aWR0aD0nNTEyJyBoZWlnaHQ9JzUxMicgcng9JzEwMCcvPjx0ZXh0IHg9JzI1NicgeT0nMzUwJyB0ZXh0LWFuY2hvcj0nbWlkZGxlJyBmb250LXNpemU9JzI2MCc+8J+OojwvdGV4dD48L3N2Zz4iLAogICAgInNpemVzIjogIjUxMng1MTIiLAogICAgInR5cGUiOiAiaW1hZ2Uvc3ZnK3htbCIsCiAgICAicHVycG9zZSI6ICJhbnkgbWFza2FibGUiCiAgfV0KfQ==">
+  <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%232563eb' width='100' height='100' rx='20'/><text x='50' y='68' text-anchor='middle' font-size='50'>%F0%9F%8E%A2</text></svg>">
+<style>
+:root {
+  --bg: #f0f2f5;
+  --card-bg: #ffffff;
+  --text: #1a1a2e;
+  --text-muted: #6b7280;
+  --primary: #2563eb;
+  --primary-light: #dbeafe;
+  --success: #16a34a;
+  --success-light: #dcfce7;
+  --warning: #d97706;
+  --warning-light: #fef3c7;
+  --danger: #dc2626;
+  --danger-light: #fee2e2;
+  --purple: #7c3aed;
+  --purple-light: #ede9fe;
+  --orange: #ea580c;
+  --orange-light: #fff7ed;
+  --border: #e5e7eb;
+  --shadow: 0 1px 3px rgba(0,0,0,0.1);
+  --shadow-lg: 0 4px 12px rgba(0,0,0,0.12);
+  --radius: 12px;
+  --radius-sm: 8px;
+  --sat: env(safe-area-inset-top);
+  --sab: env(safe-area-inset-bottom);
+}
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg); color: var(--text); line-height: 1.5; -webkit-font-smoothing: antialiased;
+  padding-bottom: calc(80px + var(--sab)); padding-top: var(--sat); overflow-x: hidden;
+}
+.app-header {
+  background: linear-gradient(135deg, #1e3a5f 0%, #2563eb 100%); color: white;
+  padding: 16px 16px 12px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+.header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.header-top h1 { font-size: 20px; font-weight: 700; letter-spacing: -0.3px; }
+.header-actions { display: flex; gap: 8px; align-items: center; }
+.header-btn {
+  background: rgba(255,255,255,0.2); border: none; color: white; width: 36px; height: 36px;
+  border-radius: 50%; font-size: 18px; cursor: pointer; display: flex; align-items: center;
+  justify-content: center; transition: background 0.2s;
+}
+.header-btn:active { background: rgba(255,255,255,0.35); }
+.header-btn.spinning { animation: spin 1s linear infinite; }
+@keyframes spin { 100% { transform: rotate(360deg); } }
+.header-info { display: flex; justify-content: space-between; align-items: center; font-size: 13px; opacity: 0.9; }
+.header-info span { display: flex; align-items: center; gap: 4px; }
+#day-note { background: rgba(255,255,255,0.15); padding: 6px 10px; border-radius: var(--radius-sm); font-size: 12px; margin-top: 8px; font-weight: 500; }
+.pass-badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+.pass-badge.ll { background: #fbbf24; color: #78350f; }
+.pass-badge.express { background: #a855f7; color: white; }
+.day-tabs-container { position: fixed; bottom: 0; left: 0; right: 0; background: var(--card-bg); border-top: 1px solid var(--border); z-index: 100; padding-bottom: var(--sab); box-shadow: 0 -2px 8px rgba(0,0,0,0.08); }
+#day-tabs { display: flex; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+#day-tabs::-webkit-scrollbar { display: none; }
+.day-tab { flex: 1; min-width: 0; background: none; border: none; padding: 12px 8px; font-size: 11px; font-weight: 600; color: var(--text-muted); cursor: pointer; text-align: center; white-space: nowrap; transition: all 0.2s; border-top: 3px solid transparent; }
+.day-tab.active { color: var(--primary); border-top-color: var(--primary); background: var(--primary-light); }
+#park-toggle { display: none; gap: 8px; padding: 8px 16px; background: var(--card-bg); border-bottom: 1px solid var(--border); }
+.park-toggle-btn { flex: 1; padding: 6px 12px; border: 2px solid var(--border); border-radius: var(--radius-sm); background: white; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; color: var(--text-muted); }
+.park-toggle-btn.active { border-color: var(--primary); background: var(--primary-light); color: var(--primary); }
+.stats-bar { display: flex; justify-content: space-around; padding: 10px 16px; background: var(--card-bg); margin: 8px 12px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; color: var(--text-muted); box-shadow: var(--shadow); }
+#active-ride-banner { display: none; position: sticky; top: 100px; z-index: 90; background: linear-gradient(135deg, #16a34a 0%, #15803d 100%); color: white; padding: 12px 16px; align-items: center; justify-content: space-between; box-shadow: var(--shadow-lg); }
+.active-ride-info { display: flex; flex-direction: column; gap: 2px; }
+.active-ride-info strong { font-size: 15px; }
+#active-timer { font-size: 24px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.section { padding: 12px; }
+.section h2 { font-size: 16px; font-weight: 700; margin-bottom: 10px; padding: 0 4px; color: var(--text); cursor: pointer; }
+.recommended-section h2 { color: var(--primary); }
+.alt-header { font-size: 13px; color: var(--text-muted); margin: 12px 0 6px; padding: 0 4px; font-weight: 500; }
+.ride-card { background: var(--card-bg); border-radius: var(--radius); padding: 14px; margin-bottom: 10px; box-shadow: var(--shadow); transition: transform 0.15s, box-shadow 0.15s; border-left: 4px solid transparent; position: relative; }
+.ride-card.recommended { border-left-color: var(--primary); box-shadow: var(--shadow-lg); }
+.ride-card.done { opacity: 0.6; border-left-color: var(--success); }
+.ride-card.skipped { opacity: 0.5; border-left-color: var(--text-muted); }
+.ride-card:active { transform: scale(0.985); }
+.ride-header { margin-bottom: 8px; }
+.ride-title-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.ride-name { font-size: 16px; font-weight: 700; color: var(--text); }
+.status-badge { font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: 600; text-transform: uppercase; }
+.status-badge.down { background: var(--warning-light); color: var(--warning); }
+.status-badge.closed { background: var(--danger-light); color: var(--danger); }
+.ride-meta { display: flex; justify-content: space-between; align-items: center; margin-top: 3px; }
+.ride-land { font-size: 12px; color: var(--text-muted); }
+.ride-priority { font-size: 12px; color: #fbbf24; letter-spacing: 1px; }
+.ride-info { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+.ride-info-left { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.ride-info-right { flex-shrink: 0; }
+.wait-time { font-size: 15px; font-weight: 700; padding: 3px 10px; border-radius: 20px; font-variant-numeric: tabular-nums; }
+.wait-short { background: var(--success-light); color: var(--success); }
+.wait-medium { background: var(--warning-light); color: var(--warning); }
+.wait-long { background: var(--danger-light); color: var(--danger); }
+.wait-extreme { background: var(--danger); color: white; }
+.wait-unknown { background: #f3f4f6; color: #9ca3af; }
+.fast-pass-badge { font-size: 10px; padding: 2px 8px; border-radius: 4px; font-weight: 700; text-transform: uppercase; background: #fbbf24; color: #78350f; letter-spacing: 0.3px; }
+.fast-pass-badge.paid { background: var(--purple-light); color: var(--purple); }
+.height-req { font-size: 12px; font-weight: 600; color: var(--text-muted); background: #f3f4f6; padding: 2px 8px; border-radius: 4px; }
+.family-badge { font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 6px; white-space: nowrap; }
+.family-badge.all-family { background: var(--success-light); color: var(--success); }
+.family-badge.borderline { background: var(--orange-light); color: var(--orange); }
+.family-badge.older-only { background: var(--primary-light); color: var(--primary); }
+.family-badge.child-swap { background: var(--purple-light); color: var(--purple); }
+.ride-tip { background: #f8fafc; border-radius: var(--radius-sm); padding: 8px 10px; margin: 6px 0; border: 1px solid var(--border); }
+.ride-tip p { font-size: 12px; color: var(--text-muted); line-height: 1.4; }
+.tip-toggle { background: none; border: none; font-size: 11px; color: var(--primary); font-weight: 600; cursor: pointer; padding: 2px 0; }
+.ride-actions { display: flex; gap: 8px; margin-top: 10px; align-items: center; }
+.btn-ride { padding: 8px 16px; border: none; border-radius: var(--radius-sm); font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.15s; }
+.btn-ride:active { transform: scale(0.95); }
+.btn-go { background: var(--primary); color: white; flex: 1; }
+.btn-done { background: var(--success); color: white; }
+.btn-skip { background: #e5e7eb; color: var(--text-muted); }
+.btn-undo { background: #e5e7eb; color: var(--text-muted); font-size: 12px; padding: 6px 12px; }
+.done-label { font-size: 13px; font-weight: 600; color: var(--success); }
+.skip-label { font-size: 13px; font-weight: 600; color: var(--text-muted); }
+.filter-bar { display: flex; gap: 6px; margin-bottom: 10px; overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 4px; }
+.filter-btn { padding: 6px 14px; border: 1.5px solid var(--border); border-radius: 20px; background: white; font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap; color: var(--text-muted); transition: all 0.15s; }
+.filter-btn.active { border-color: var(--primary); background: var(--primary-light); color: var(--primary); }
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; align-items: flex-end; justify-content: center; }
+.modal-content { background: var(--card-bg); border-radius: var(--radius) var(--radius) 0 0; padding: 24px 20px calc(20px + var(--sab)); width: 100%; max-width: 500px; max-height: 80vh; overflow-y: auto; }
+.modal-content h2 { font-size: 20px; margin-bottom: 16px; }
+.modal-content label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 6px; color: var(--text); }
+.modal-content input[type="number"] { width: 100%; padding: 10px 12px; border: 2px solid var(--border); border-radius: var(--radius-sm); font-size: 16px; margin-bottom: 16px; -webkit-appearance: none; }
+.modal-content input[type="number"]:focus { outline: none; border-color: var(--primary); }
+.modal-actions { display: flex; gap: 10px; margin-top: 8px; }
+.modal-actions button { flex: 1; padding: 12px; border: none; border-radius: var(--radius-sm); font-size: 15px; font-weight: 700; cursor: pointer; }
+.btn-primary { background: var(--primary); color: white; }
+.btn-secondary { background: #e5e7eb; color: var(--text); }
+.btn-danger { background: var(--danger); color: white; margin-top: 16px; width: 100%; padding: 12px; border: none; border-radius: var(--radius-sm); font-size: 14px; font-weight: 600; cursor: pointer; }
+.legend { padding: 12px 16px; margin: 8px 12px; background: var(--card-bg); border-radius: var(--radius-sm); box-shadow: var(--shadow); }
+.legend h3 { font-size: 13px; margin-bottom: 8px; color: var(--text-muted); }
+.legend-items { display: flex; flex-wrap: wrap; gap: 6px; }
+.legend-item { font-size: 11px; padding: 3px 8px; border-radius: 4px; }
+.empty-state { text-align: center; padding: 40px 20px; color: var(--text-muted); }
+.empty-state .emoji { font-size: 48px; margin-bottom: 12px; }
+.closed-section .ride-card { opacity: 0.5; }
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 2px; }
+@media (min-width: 768px) {
+  .section { max-width: 600px; margin: 0 auto; padding: 12px 16px; }
+  .stats-bar { max-width: 600px; margin: 8px auto; }
+  .app-header { text-align: center; }
+}
+</style>
+</head>
+<body>
+  <header class="app-header">
+    <div class="header-top">
+      <h1 id="park-title">Magic Kingdom</h1>
+      <div class="header-actions">
+        <button class="header-btn" id="refresh-btn" onclick="app.refreshWaitTimes()" title="Refresh wait times">&#x21BB;</button>
+        <button class="header-btn" onclick="app.showSettings()" title="Settings">&#x2699;</button>
+      </div>
+    </div>
+    <div class="header-info">
+      <span id="time-remaining">--</span>
+      <span id="pass-type" class="pass-badge" style="display:none"></span>
+      <span id="last-fetch">Wait times not loaded</span>
+    </div>
+    <div id="day-note" style="display:none"></div>
+  </header>
+  <div id="active-ride-banner"></div>
+  <div id="park-toggle"></div>
+  <div class="legend">
+    <h3>Quick Guide</h3>
+    <div class="legend-items">
+      <span class="legend-item family-badge all-family">&#x1F46A; All Family</span>
+      <span class="legend-item family-badge borderline">&#x26A0;&#xFE0F; Borderline</span>
+      <span class="legend-item family-badge older-only">&#x1F9D1; Older + Adults</span>
+      <span class="legend-item family-badge child-swap">&#x1F504; Child Swap</span>
+    </div>
+  </div>
+  <main id="rides-container">
+    <div class="empty-state">
+      <div class="emoji">&#x1F3A2;</div>
+      <p>Loading ride data...</p>
+    </div>
+  </main>
+  <nav class="day-tabs-container">
+    <div id="day-tabs"></div>
+  </nav>
+  <div class="modal-overlay" id="settings-modal">
+    <div class="modal-content">
+      <h2>Settings</h2>
+      <label for="height-older">Older Child Height (inches)</label>
+      <input type="number" id="height-older" min="30" max="60" value="44" inputmode="numeric">
+      <label for="height-younger">Younger Child Height (inches)</label>
+      <input type="number" id="height-younger" min="30" max="60" value="39" inputmode="numeric">
+      <p style="font-size:12px; color:#6b7280; margin-bottom:16px;">
+        Adjusting heights will re-classify which rides are "All Family" vs "Child Swap."
+        Borderline rides are within 2" of the requirement.
+      </p>
+      <div class="modal-actions">
+        <button class="btn-secondary" onclick="app.hideSettings()">Cancel</button>
+        <button class="btn-primary" onclick="app.saveSettings()">Save</button>
+      </div>
+      <button class="btn-danger" onclick="app.resetDay()">Reset All Rides for This Day</button>
+    </div>
+  </div>
+<script>
+// ============================================================
+// Disney/Universal Ride Optimizer - Ride Database
+// ============================================================
+const CONFIG = {
+  heights: { older: 44, younger: 39 },
+  borderlineThreshold: 2,
+  parkApiIds: {},
+  days: [
+    { id: 'mk', label: 'Day 1', parkName: 'Magic Kingdom', parks: ['mk'], arrival: '08:00', departure: '21:00', hasLightningLane: true, hasExpressPass: false },
+    { id: 'universal', label: 'Day 2', parkName: 'Universal + Islands', parks: ['usf', 'ioa'], arrival: '08:00', departure: '21:00', hasLightningLane: false, hasExpressPass: true },
+    { id: 'epic', label: 'Day 3', parkName: 'EPIC Universe', parks: ['epic'], arrival: '08:00', departure: '21:00', hasLightningLane: false, hasExpressPass: false },
+    { id: 'hs', label: 'Day 4', parkName: 'Hollywood Studios', parks: ['hs'], arrival: '08:00', departure: '15:00', hasLightningLane: true, hasExpressPass: false, note: 'Half day - depart by 3pm for 5:58pm flight from MCO' },
+  ],
+};
+const PARK_META = {
+  mk: { name: 'Magic Kingdom', searchTerms: ['magic kingdom'], destination: 'Walt Disney World' },
+  hs: { name: 'Hollywood Studios', searchTerms: ['hollywood studios'], destination: 'Walt Disney World' },
+  usf: { name: 'Universal Studios Florida', searchTerms: ['universal studios florida'], destination: 'Universal Orlando' },
+  ioa: { name: 'Islands of Adventure', searchTerms: ['islands of adventure'], destination: 'Universal Orlando' },
+  epic: { name: 'EPIC Universe', searchTerms: ['epic universe'], destination: 'Universal Orlando' },
+};
+const RIDES = {
+  mk: [
+    { id: 'mk-seven-dwarfs', name: 'Seven Dwarfs Mine Train', land: 'Fantasyland', heightReq: 38, priority: 5, thrill: 'moderate', rideTime: 3, childSwap: true, tip: 'Rope drop priority #1 or use Lightning Lane. Consistently the longest wait in MK.' },
+    { id: 'mk-tron', name: 'TRON Lightcycle / Run', land: 'Tomorrowland', heightReq: 48, priority: 5, thrill: 'thrilling', rideTime: 2, childSwap: true, tip: 'Uses virtual queue or Lightning Lane. Check the app first thing in the morning for a boarding group.' },
+    { id: 'mk-tianas', name: "Tiana's Bayou Adventure", land: 'Frontierland', heightReq: 40, priority: 5, thrill: 'moderate', rideTime: 11, childSwap: true, tip: 'Newest ride in MK - very popular. Has a small drop. Lightning Lane recommended.' },
+    { id: 'mk-peter-pan', name: "Peter Pan's Flight", land: 'Fantasyland', heightReq: null, priority: 5, thrill: 'gentle', rideTime: 3, childSwap: false, tip: 'Classic dark ride with perpetually long waits. Ride at rope drop or use Lightning Lane.' },
+    { id: 'mk-big-thunder', name: 'Big Thunder Mountain Railroad', land: 'Frontierland', heightReq: 40, priority: 4, thrill: 'moderate', rideTime: 4, childSwap: true, tip: 'Fun family coaster. Waits drop in the evening.' },
+    { id: 'mk-space-mountain', name: 'Space Mountain', land: 'Tomorrowland', heightReq: 44, priority: 4, thrill: 'thrilling', rideTime: 3, childSwap: true, tip: 'Classic indoor coaster in the dark. Can be intense for younger riders.' },
+    { id: 'mk-pirates', name: 'Pirates of the Caribbean', land: 'Adventureland', heightReq: null, priority: 4, thrill: 'gentle', rideTime: 12, childSwap: false, tip: 'Classic boat ride. Small drop at the start. Usually moderate waits.' },
+    { id: 'mk-haunted-mansion', name: 'Haunted Mansion', land: 'Liberty Square', heightReq: null, priority: 4, thrill: 'gentle', rideTime: 9, childSwap: false, tip: 'Spooky but not scary for most kids. Iconic ride, must-do for first timers.' },
+    { id: 'mk-jungle-cruise', name: 'Jungle Cruise', land: 'Adventureland', heightReq: null, priority: 4, thrill: 'gentle', rideTime: 10, childSwap: false, tip: 'Boat ride with corny jokes. Kids love the animals. Waits can be long midday.' },
+    { id: 'mk-buzz', name: "Buzz Lightyear's Space Ranger Spin", land: 'Tomorrowland', heightReq: null, priority: 4, thrill: 'gentle', rideTime: 5, childSwap: false, tip: 'Interactive shooting ride - kids love competing for high scores.' },
+    { id: 'mk-barnstormer', name: 'The Barnstormer', land: 'Fantasyland', heightReq: 35, priority: 3, thrill: 'moderate', rideTime: 1, childSwap: true, tip: 'Short kiddie coaster. Good intro to coasters for little ones. Very short ride.' },
+    { id: 'mk-winnie-pooh', name: 'Many Adventures of Winnie the Pooh', land: 'Fantasyland', heightReq: null, priority: 3, thrill: 'gentle', rideTime: 4, childSwap: false, tip: 'Gentle dark ride. Great for younger kids.' },
+    { id: 'mk-under-the-sea', name: 'Under the Sea - Journey of the Little Mermaid', land: 'Fantasyland', heightReq: null, priority: 3, thrill: 'gentle', rideTime: 7, childSwap: false, tip: 'Gentle dark ride through Little Mermaid scenes. Usually short wait.' },
+    { id: 'mk-speedway', name: 'Tomorrowland Speedway', land: 'Tomorrowland', heightReq: 32, priority: 3, thrill: 'gentle', rideTime: 5, childSwap: false, tip: 'Go-kart style ride. Kids love driving. 54" to drive alone, otherwise ride with an adult.' },
+    { id: 'mk-peoplemover', name: 'Tomorrowland Transit Authority PeopleMover', land: 'Tomorrowland', heightReq: null, priority: 3, thrill: 'gentle', rideTime: 10, childSwap: false, tip: 'Relaxing ride with great views. Almost never a wait. Good breather between big rides.' },
+    { id: 'mk-small-world', name: "It's a Small World", land: 'Fantasyland', heightReq: null, priority: 3, thrill: 'gentle', rideTime: 13, childSwap: false, tip: 'Classic boat ride. Long ride, good for a mid-day break.' },
+    { id: 'mk-mad-tea', name: 'Mad Tea Party', land: 'Fantasyland', heightReq: null, priority: 2, thrill: 'moderate', rideTime: 2, childSwap: false, tip: 'Spinning teacups. You control how fast you spin.' },
+    { id: 'mk-dumbo', name: 'Dumbo the Flying Elephant', land: 'Fantasyland', heightReq: null, priority: 2, thrill: 'gentle', rideTime: 2, childSwap: false, tip: 'Classic spinner ride. Kids love it but similar to Aladdin carpets.' },
+    { id: 'mk-aladdin', name: 'Magic Carpets of Aladdin', land: 'Adventureland', heightReq: null, priority: 2, thrill: 'gentle', rideTime: 2, childSwap: false, tip: 'Spinner ride similar to Dumbo. Usually shorter wait.' },
+    { id: 'mk-carousel-progress', name: 'Carousel of Progress', land: 'Tomorrowland', heightReq: null, priority: 2, thrill: 'gentle', rideTime: 21, childSwap: false, tip: 'Classic rotating theater show. Long show but rarely a wait. Good AC break.' },
+    { id: 'mk-monsters', name: 'Monsters Inc. Laugh Floor', land: 'Tomorrowland', heightReq: null, priority: 2, thrill: 'gentle', rideTime: 15, childSwap: false, tip: 'Interactive comedy show. Fun and air conditioned.' },
+    { id: 'mk-philharmagic', name: "Mickey's PhilharMagic", land: 'Fantasyland', heightReq: null, priority: 2, thrill: 'gentle', rideTime: 12, childSwap: false, tip: '3D movie show. Great for all ages. Good AC break.' },
+  ],
+  ioa: [
+    { id: 'ioa-hagrids', name: "Hagrid's Magical Creatures Motorbike Adventure", land: 'Wizarding World of HP - Hogsmeade', heightReq: 48, priority: 5, thrill: 'thrilling', rideTime: 4, childSwap: true, tip: 'Best ride in the park. Use Express Pass. Consistently 60-120+ min wait without it.' },
+    { id: 'ioa-velocicoaster', name: 'VelociCoaster', land: 'Jurassic Park', heightReq: 51, priority: 5, thrill: 'thrilling', rideTime: 3, childSwap: true, tip: 'World-class coaster. Adults only at these heights. Use Express Pass.' },
+    { id: 'ioa-forbidden-journey', name: 'Harry Potter and the Forbidden Journey', land: 'Wizarding World of HP - Hogsmeade', heightReq: 48, priority: 4, thrill: 'thrilling', rideTime: 5, childSwap: true, tip: 'Incredible motion-base dark ride. Can cause motion sickness. Express Pass available.' },
+    { id: 'ioa-spider-man', name: 'The Amazing Adventures of Spider-Man', land: 'Marvel Super Hero Island', heightReq: 40, priority: 4, thrill: 'moderate', rideTime: 5, childSwap: true, tip: 'Classic 3D dark ride. Great for kids who meet the height. Express Pass available.' },
+    { id: 'ioa-kong', name: 'Skull Island: Reign of Kong', land: 'Skull Island', heightReq: 36, priority: 4, thrill: 'moderate', rideTime: 5, childSwap: true, tip: 'Truck ride through Skull Island. Some scary moments but both kids can ride.' },
+    { id: 'ioa-jurassic-world', name: 'Jurassic World Adventure', land: 'Jurassic Park', heightReq: 42, priority: 4, thrill: 'moderate', rideTime: 7, childSwap: true, tip: 'Boat ride with a big water drop at the end. You may get wet.' },
+    { id: 'ioa-hippogriff', name: 'Flight of the Hippogriff', land: 'Wizarding World of HP - Hogsmeade', heightReq: 36, priority: 4, thrill: 'moderate', rideTime: 1, childSwap: true, tip: 'Family-friendly coaster in Hogsmeade. Both kids can ride. Short but fun.' },
+    { id: 'ioa-hulk', name: 'The Incredible Hulk Coaster', land: 'Marvel Super Hero Island', heightReq: 54, priority: 4, thrill: 'thrilling', rideTime: 2, childSwap: true, tip: 'Launch coaster with inversions. Adults only. Express Pass available.' },
+    { id: 'ioa-ripsaw-falls', name: "Dudley Do-Right's Ripsaw Falls", land: 'Toon Lagoon', heightReq: 44, priority: 3, thrill: 'moderate', rideTime: 5, childSwap: true, tip: 'Log flume with a big drop. You WILL get soaked. Older kid borderline at 44".' },
+    { id: 'ioa-pteranodon', name: 'Pteranodon Flyers', land: 'Jurassic Park', heightReq: 36, priority: 3, thrill: 'gentle', rideTime: 3, childSwap: false, tip: 'Unique: 36" min, 56" max. Adults can ONLY ride with a child under 56". Often long wait, no Express.' },
+    { id: 'ioa-cat-in-hat', name: 'The Cat in the Hat', land: 'Seuss Landing', heightReq: null, priority: 3, thrill: 'gentle', rideTime: 4, childSwap: false, tip: 'Dark ride through Dr. Seuss story. Great for younger kids.' },
+    { id: 'ioa-seuss-trolley', name: 'High in the Sky Seuss Trolley Train Ride', land: 'Seuss Landing', heightReq: 36, priority: 3, thrill: 'gentle', rideTime: 5, childSwap: false, tip: 'Elevated train ride with great views of Seuss Landing.' },
+    { id: 'ioa-one-fish', name: 'One Fish, Two Fish, Red Fish, Blue Fish', land: 'Seuss Landing', heightReq: null, priority: 2, thrill: 'gentle', rideTime: 2, childSwap: false, tip: 'Spinner ride with water squirts. Fun for little kids.' },
+    { id: 'ioa-caro-seuss-el', name: 'Caro-Seuss-el', land: 'Seuss Landing', heightReq: null, priority: 2, thrill: 'gentle', rideTime: 2, childSwap: false, tip: 'Dr. Seuss themed carousel.' },
+    { id: 'ioa-bilge-rat', name: "Popeye & Bluto's Bilge-Rat Barges", land: 'Toon Lagoon', heightReq: 42, priority: 2, thrill: 'moderate', rideTime: 5, childSwap: true, tip: 'River rapids ride. You WILL get completely drenched. February may be too cold for this.' },
+  ],
+  usf: [
+    { id: 'usf-gringotts', name: 'Harry Potter and the Escape from Gringotts', land: 'Wizarding World of HP - Diagon Alley', heightReq: 42, priority: 5, thrill: 'moderate', rideTime: 5, childSwap: true, tip: 'Amazing dark ride/coaster hybrid. Express Pass available. Walk through Diagon Alley is incredible.' },
+    { id: 'usf-mummy', name: 'Revenge of the Mummy', land: 'New York', heightReq: 48, priority: 4, thrill: 'thrilling', rideTime: 3, childSwap: true, tip: 'Indoor coaster with fire effects. Intense. Express Pass available.' },
+    { id: 'usf-transformers', name: 'Transformers: The Ride 3D', land: 'Production Central', heightReq: 40, priority: 4, thrill: 'moderate', rideTime: 5, childSwap: true, tip: 'Similar ride system to Spider-Man. Great 3D effects. Express Pass available.' },
+    { id: 'usf-rip-ride-rockit', name: 'Hollywood Rip Ride Rockit', land: 'Production Central', heightReq: 51, priority: 4, thrill: 'thrilling', rideTime: 2, childSwap: true, tip: 'Outdoor coaster where you pick your own music. Adults only. Express Pass available.' },
+    { id: 'usf-men-in-black', name: 'Men in Black Alien Attack', land: 'World Expo', heightReq: 42, priority: 3, thrill: 'moderate', rideTime: 5, childSwap: true, tip: 'Interactive shooting dark ride. Fun competition between sides of the car.' },
+    { id: 'usf-et', name: 'E.T. Adventure', land: "Woody Woodpecker's KidZone", heightReq: 34, priority: 3, thrill: 'gentle', rideTime: 5, childSwap: false, tip: 'Classic gentle dark ride. Both kids can ride. You get to fly on a bicycle!' },
+    { id: 'usf-minion', name: 'Despicable Me Minion Mayhem', land: 'Production Central', heightReq: 40, priority: 3, thrill: 'moderate', rideTime: 5, childSwap: true, tip: '3D motion simulator. Fun for Minion fans. Can cause motion sickness.' },
+    { id: 'usf-fallon', name: 'Race Through New York Starring Jimmy Fallon', land: 'New York', heightReq: 40, priority: 2, thrill: 'moderate', rideTime: 4, childSwap: true, tip: '3D motion simulator with virtual queue. Usually lower wait.' },
+    { id: 'usf-woody', name: "Woody Woodpecker's Nuthouse Coaster", land: "Woody Woodpecker's KidZone", heightReq: 36, priority: 2, thrill: 'gentle', rideTime: 1, childSwap: true, tip: 'Small kiddie coaster. Good for younger riders.' },
+    { id: 'usf-kang-kodos', name: "Kang & Kodos' Twirl 'n' Hurl", land: 'Springfield', heightReq: null, priority: 2, thrill: 'gentle', rideTime: 2, childSwap: false, tip: 'Simpsons themed spinner. Usually walk-on.' },
+  ],
+  epic: [
+    { id: 'epic-mario-kart', name: "Mario Kart: Bowser's Challenge", land: 'Super Nintendo World', heightReq: 40, priority: 5, thrill: 'moderate', rideTime: 5, childSwap: true, tip: 'AR dark ride - throw shells and collect coins! 40" with adult. Headliner ride, expect long waits.' },
+    { id: 'epic-mine-cart', name: 'Mine-Cart Madness', land: 'Super Nintendo World', heightReq: 38, priority: 5, thrill: 'thrilling', rideTime: 3, childSwap: true, tip: 'Donkey Kong coaster. Both kids should meet the height. Unique ride experience.' },
+    { id: 'epic-yoshi', name: "Yoshi's Adventure", land: 'Super Nintendo World', heightReq: null, priority: 4, thrill: 'gentle', rideTime: 5, childSwap: false, tip: 'Gentle omnimover ride on Yoshi through Mushroom Kingdom. Great for all ages.' },
+    { id: 'epic-wing-gliders', name: "Hiccup's Wing Gliders", land: 'How to Train Your Dragon - Isle of Berk', heightReq: 42, priority: 4, thrill: 'moderate', rideTime: 3, childSwap: true, tip: 'Suspended family coaster. Unique flying sensation. Verify height on-site.' },
+    { id: 'epic-fyre-drill', name: 'Fyre Drill', land: 'How to Train Your Dragon - Isle of Berk', heightReq: 42, priority: 3, thrill: 'moderate', rideTime: 2, childSwap: true, tip: 'Spinning drop tower ride. Verify height requirement on-site.' },
+    { id: 'epic-ministry', name: 'Harry Potter and the Battle at the Ministry', land: 'Wizarding World - Ministry of Magic', heightReq: 42, priority: 5, thrill: 'moderate', rideTime: 5, childSwap: true, tip: 'Next-gen HP dark ride. Headliner attraction. Expect very long waits - ride early.' },
+    { id: 'epic-cirque', name: 'Le Cirque Arcanus', land: 'Wizarding World - Ministry of Magic', heightReq: null, priority: 3, thrill: 'gentle', rideTime: 4, childSwap: false, tip: 'Fantastic Beasts themed carousel/ride. Family friendly.' },
+    { id: 'epic-monsters', name: 'Monsters Unchained: The Frankenstein Experiment', land: 'Dark Universe', heightReq: 42, priority: 5, thrill: 'moderate', rideTime: 6, childSwap: true, tip: 'Massive dark ride through classic monsters. Highly acclaimed. Expect long waits.' },
+    { id: 'epic-werewolf', name: 'Curse of the Werewolf', land: 'Dark Universe', heightReq: 42, priority: 4, thrill: 'thrilling', rideTime: 2, childSwap: true, tip: 'Motorbike-style coaster. Verify height requirement on-site.' },
+    { id: 'epic-starfall', name: 'Starfall Racers', land: 'Celestial Park', heightReq: 50, priority: 4, thrill: 'thrilling', rideTime: 2, childSwap: true, tip: 'Dual-launch racing coaster. Adults only at these heights. Centerpiece of the park.' },
+    { id: 'epic-carousel', name: 'Constellation Carousel', land: 'Celestial Park', heightReq: null, priority: 2, thrill: 'gentle', rideTime: 3, childSwap: false, tip: 'Beautifully themed carousel. Great for all ages. Good photo opportunity.' },
+  ],
+  hs: [
+    { id: 'hs-rise', name: 'Star Wars: Rise of the Resistance', land: "Star Wars: Galaxy's Edge", heightReq: 40, priority: 5, thrill: 'moderate', rideTime: 18, childSwap: true, tip: 'Best ride at HS - multi-part experience. Lightning Lane highly recommended. Rope drop priority #1.' },
+    { id: 'hs-slinky', name: 'Slinky Dog Dash', land: 'Toy Story Land', heightReq: 38, priority: 5, thrill: 'moderate', rideTime: 2, childSwap: true, tip: 'Family coaster both kids can ride! Very popular. Lightning Lane or rope drop.' },
+    { id: 'hs-millennium-falcon', name: 'Millennium Falcon: Smugglers Run', land: "Star Wars: Galaxy's Edge", heightReq: 38, priority: 4, thrill: 'moderate', rideTime: 5, childSwap: true, tip: 'You fly the Falcon! Interactive - try to be the pilot. Both kids can ride.' },
+    { id: 'hs-tower', name: 'Tower of Terror', land: 'Sunset Boulevard', heightReq: 40, priority: 4, thrill: 'thrilling', rideTime: 5, childSwap: true, tip: 'Drop tower ride. Thrilling but younger kid borderline at 40". Lightning Lane available.' },
+    { id: 'hs-toy-story', name: 'Toy Story Mania!', land: 'Toy Story Land', heightReq: null, priority: 4, thrill: 'gentle', rideTime: 7, childSwap: false, tip: 'Interactive shooting ride. Whole family can ride. Kids love competing for scores.' },
+    { id: 'hs-runaway-railway', name: "Mickey & Minnie's Runaway Railway", land: 'Hollywood Boulevard', heightReq: null, priority: 4, thrill: 'gentle', rideTime: 5, childSwap: false, tip: 'Trackless dark ride. No height requirement. Great for all ages.' },
+    { id: 'hs-rockin-roller', name: "Rock 'n' Roller Coaster", land: 'Sunset Boulevard', heightReq: 48, priority: 3, thrill: 'thrilling', rideTime: 2, childSwap: true, tip: 'Launch coaster with inversions. Child swap for both kids. Skip if time is tight.' },
+    { id: 'hs-star-tours', name: 'Star Tours', land: 'Echo Lake', heightReq: 40, priority: 3, thrill: 'moderate', rideTime: 5, childSwap: true, tip: '3D motion simulator. Random destinations each time. Usually moderate waits.' },
+    { id: 'hs-alien', name: 'Alien Swirling Saucers', land: 'Toy Story Land', heightReq: 32, priority: 2, thrill: 'gentle', rideTime: 2, childSwap: false, tip: 'Whip-style spinner. Fun but short. Usually shorter wait than nearby rides.' },
+  ],
+};
+</script>
+<script>
+// ============================================================
+// Disney/Universal Ride Optimizer - Main Application
+// ============================================================
+(function () {
+  'use strict';
+  const state = {
+    currentDayIndex: 0, rides: {}, activeRide: null, activeRideStart: null,
+    parkApiIds: {}, lastFetch: null, autoRefreshInterval: null, heightsOverride: null,
+  };
+  function saveState() {
+    const toSave = { currentDayIndex: state.currentDayIndex, rides: {}, parkApiIds: state.parkApiIds, heightsOverride: state.heightsOverride };
+    for (const [id, r] of Object.entries(state.rides)) { toSave.rides[id] = { status: r.status }; }
+    localStorage.setItem('disney-optimizer-state', JSON.stringify(toSave));
+  }
+  function loadState() {
+    try {
+      const saved = JSON.parse(localStorage.getItem('disney-optimizer-state'));
+      if (!saved) return;
+      state.currentDayIndex = saved.currentDayIndex || 0;
+      state.parkApiIds = saved.parkApiIds || {};
+      state.heightsOverride = saved.heightsOverride || null;
+      if (saved.rides) { for (const [id, data] of Object.entries(saved.rides)) { if (state.rides[id]) { state.rides[id].status = data.status || 'pending'; } } }
+    } catch (e) { console.warn('Failed to load state:', e); }
+  }
+  function getHeights() { return state.heightsOverride || CONFIG.heights; }
+  function classifyRide(ride) {
+    const h = getHeights();
+    if (!ride.heightReq) return { label: 'All Family', class: 'all-family', icon: '\u{1F46A}' };
+    if (ride.heightReq <= h.younger) return { label: 'All Family', class: 'all-family', icon: '\u{1F46A}' };
+    if (ride.heightReq <= h.younger + CONFIG.borderlineThreshold) return { label: `Younger Borderline (${ride.heightReq}")`, class: 'borderline', icon: '\u26A0\uFE0F' };
+    if (ride.heightReq <= h.older) return { label: 'Older Kid + Adults', class: 'older-only', icon: '\u{1F9D1}' };
+    if (ride.heightReq <= h.older + CONFIG.borderlineThreshold) return { label: `Older Borderline (${ride.heightReq}")`, class: 'borderline', icon: '\u26A0\uFE0F' };
+    return { label: 'Child Swap', class: 'child-swap', icon: '\u{1F504}' };
+  }
+  function waitTimeClass(minutes) {
+    if (minutes === null || minutes === undefined) return 'wait-unknown';
+    if (minutes <= 15) return 'wait-short';
+    if (minutes <= 30) return 'wait-medium';
+    if (minutes <= 60) return 'wait-long';
+    return 'wait-extreme';
+  }
+  const API_BASE = 'https://api.themeparks.wiki/v1';
+  async function discoverParkIds() {
+    try {
+      const resp = await fetch(`${API_BASE}/destinations`);
+      const data = await resp.json();
+      for (const dest of (data.destinations || [])) {
+        for (const park of (dest.parks || [])) {
+          const parkNameLower = park.name.toLowerCase();
+          for (const [key, meta] of Object.entries(PARK_META)) {
+            for (const term of meta.searchTerms) { if (parkNameLower.includes(term)) { state.parkApiIds[key] = park.id; } }
+          }
+        }
+      }
+      saveState();
+    } catch (e) { console.warn('Failed to discover park IDs:', e); }
+  }
+  async function fetchWaitTimes(parkKey) {
+    const entityId = state.parkApiIds[parkKey];
+    if (!entityId) return null;
+    try { const resp = await fetch(`${API_BASE}/entity/${entityId}/live`); const data = await resp.json(); return data.liveData || []; }
+    catch (e) { console.warn(`Failed to fetch wait times for ${parkKey}:`, e); return null; }
+  }
+  function matchRideToApi(ride, liveData) {
+    const normalize = (s) => s.toLowerCase().replace(/[^a-z0-9]/g, '');
+    const rideNorm = normalize(ride.name);
+    for (const item of liveData) { if (normalize(item.name) === rideNorm) return item; }
+    for (const item of liveData) { const apiNorm = normalize(item.name); if (apiNorm.includes(rideNorm) || rideNorm.includes(apiNorm)) return item; }
+    const keywords = ride.name.split(/[\s:]+/).filter(w => w.length > 3);
+    for (const item of liveData) { const apiNorm = normalize(item.name); if (keywords.some(kw => apiNorm.includes(normalize(kw)))) return item; }
+    return null;
+  }
+  async function refreshWaitTimes() {
+    const day = CONFIG.days[state.currentDayIndex];
+    const btn = document.getElementById('refresh-btn');
+    if (btn) { btn.classList.add('spinning'); btn.disabled = true; }
+    const allLiveData = {};
+    await Promise.all(day.parks.map(async (parkKey) => { const live = await fetchWaitTimes(parkKey); if (live) allLiveData[parkKey] = live; }));
+    for (const [id, ride] of Object.entries(state.rides)) {
+      if (!day.parks.includes(ride.park)) continue;
+      const liveData = allLiveData[ride.park]; if (!liveData) continue;
+      const match = matchRideToApi(ride, liveData);
+      if (match) {
+        ride.apiEntityId = match.id; ride.rideStatus = match.status || 'UNKNOWN';
+        if (match.queue) {
+          if (match.queue.STANDBY) { ride.waitTime = match.queue.STANDBY.waitTime; }
+          ride.hasReturnTime = !!(match.queue.RETURN_TIME && match.queue.RETURN_TIME.state === 'AVAILABLE');
+          ride.hasPaidReturn = !!(match.queue.PAID_RETURN_TIME && match.queue.PAID_RETURN_TIME.state === 'AVAILABLE');
+          if (match.queue.PAID_RETURN_TIME && match.queue.PAID_RETURN_TIME.price) { ride.paidReturnPrice = match.queue.PAID_RETURN_TIME.price.amount; }
+        }
+      }
+    }
+    state.lastFetch = new Date();
+    if (btn) { btn.classList.remove('spinning'); btn.disabled = false; }
+    renderRides(); updateLastFetchDisplay();
+  }
+  function calculateScore(ride, day) {
+    if (ride.status === 'done' || ride.status === 'skipped' || ride.status === 'riding') return -1;
+    if (ride.rideStatus === 'CLOSED' || ride.rideStatus === 'DOWN' || ride.rideStatus === 'REFURBISHMENT') return -1;
+    const classification = classifyRide(ride);
+    let wait = ride.waitTime != null ? ride.waitTime : 30;
+    if (classification.class === 'child-swap') { wait *= 1.4; }
+    if ((day.hasExpressPass || day.hasLightningLane) && ride.waitTime > 20) { wait = Math.min(wait, 15); }
+    const priorityWeight = Math.pow(ride.priority, 2);
+    return Math.round((priorityWeight * 100) / (wait + ride.rideTime + 5) * 100) / 100;
+  }
+  function getOptimizedRides() {
+    const day = CONFIG.days[state.currentDayIndex];
+    const rideList = Object.values(state.rides).filter(r => day.parks.includes(r.park)).map(r => ({ ...r, classification: classifyRide(r), score: calculateScore(r, day), waitClass: waitTimeClass(r.waitTime) }));
+    return {
+      pending: rideList.filter(r => r.status === 'pending' && r.score > 0).sort((a, b) => b.score - a.score),
+      done: rideList.filter(r => r.status === 'done'),
+      skipped: rideList.filter(r => r.status === 'skipped'),
+      closed: rideList.filter(r => r.status === 'pending' && (r.rideStatus === 'CLOSED' || r.rideStatus === 'DOWN' || r.rideStatus === 'REFURBISHMENT')),
+    };
+  }
+  function getTimeRemaining() {
+    const day = CONFIG.days[state.currentDayIndex]; const now = new Date();
+    const [depH, depM] = day.departure.split(':').map(Number); const departure = new Date(now); departure.setHours(depH, depM, 0, 0);
+    const diffMs = departure - now;
+    if (diffMs <= 0) return { hours: 0, minutes: 0, text: 'Park day ended' };
+    return { hours: Math.floor(diffMs / 3600000), minutes: Math.floor((diffMs % 3600000) / 60000), text: `${Math.floor(diffMs / 3600000)}h ${Math.floor((diffMs % 3600000) / 60000)}m remaining` };
+  }
+  function initializeRides() {
+    state.rides = {};
+    for (const [parkKey, rides] of Object.entries(RIDES)) {
+      for (const ride of rides) { state.rides[ride.id] = { ...ride, park: parkKey, status: 'pending', waitTime: null, rideStatus: 'UNKNOWN', apiEntityId: null, hasReturnTime: false, hasPaidReturn: false, paidReturnPrice: null, score: 0 }; }
+    }
+  }
+  function renderDayTabs() {
+    const tabs = document.getElementById('day-tabs'); tabs.innerHTML = '';
+    CONFIG.days.forEach((day, i) => { const tab = document.createElement('button'); tab.className = `day-tab ${i === state.currentDayIndex ? 'active' : ''}`; tab.textContent = day.parkName; tab.onclick = () => switchDay(i); tabs.appendChild(tab); });
+  }
+  function renderHeader() {
+    const day = CONFIG.days[state.currentDayIndex]; const timeInfo = getTimeRemaining();
+    document.getElementById('park-title').textContent = day.parkName;
+    document.getElementById('time-remaining').textContent = timeInfo.text;
+    const noteEl = document.getElementById('day-note');
+    if (day.note) { noteEl.textContent = day.note; noteEl.style.display = 'block'; } else { noteEl.style.display = 'none'; }
+    const passEl = document.getElementById('pass-type');
+    if (day.hasLightningLane) { passEl.textContent = 'Lightning Lane Active'; passEl.className = 'pass-badge ll'; passEl.style.display = 'inline-block'; }
+    else if (day.hasExpressPass) { passEl.textContent = 'Express Pass Active'; passEl.className = 'pass-badge express'; passEl.style.display = 'inline-block'; }
+    else { passEl.style.display = 'none'; }
+  }
+  function createRideCard(ride, isRecommended) {
+    const card = document.createElement('div'); card.className = `ride-card ${ride.status} ${isRecommended ? 'recommended' : ''}`; card.dataset.rideId = ride.id;
+    const statusBadge = ride.rideStatus === 'DOWN' ? '<span class="status-badge down">Temporarily Down</span>' : ride.rideStatus === 'CLOSED' ? '<span class="status-badge closed">Closed</span>' : ride.rideStatus === 'REFURBISHMENT' ? '<span class="status-badge closed">Refurbishment</span>' : '';
+    const waitDisplay = ride.waitTime != null ? `<span class="wait-time ${ride.waitClass}">${ride.waitTime} min</span>` : '<span class="wait-time wait-unknown">-- min</span>';
+    const fastPassBadge = ride.hasReturnTime ? '<span class="fast-pass-badge">LL Available</span>' : ride.hasPaidReturn ? `<span class="fast-pass-badge paid">LL $${ride.paidReturnPrice || '?'}</span>` : '';
+    const classification = ride.classification || classifyRide(ride);
+    const heightInfo = ride.heightReq ? `<span class="height-req">${ride.heightReq}" min</span>` : '';
+    const priorityStars = '\u2605'.repeat(ride.priority) + '\u2606'.repeat(5 - ride.priority);
+    let actionsHtml = '';
+    if (ride.status === 'pending') { actionsHtml = `<div class="ride-actions"><button class="btn-ride btn-go" onclick="app.markRiding('${ride.id}')">Ride Now</button><button class="btn-ride btn-done" onclick="app.markDone('${ride.id}')">Done</button><button class="btn-ride btn-skip" onclick="app.markSkipped('${ride.id}')">Skip</button></div>`; }
+    else if (ride.status === 'done') { actionsHtml = `<div class="ride-actions"><span class="done-label">Completed</span><button class="btn-ride btn-undo" onclick="app.markPending('${ride.id}')">Undo</button></div>`; }
+    else if (ride.status === 'skipped') { actionsHtml = `<div class="ride-actions"><span class="skip-label">Skipped</span><button class="btn-ride btn-undo" onclick="app.markPending('${ride.id}')">Undo</button></div>`; }
+    card.innerHTML = `<div class="ride-header"><div class="ride-title-row"><span class="ride-name">${ride.name}</span>${statusBadge}</div><div class="ride-meta"><span class="ride-land">${ride.land}</span><span class="ride-priority">${priorityStars}</span></div></div><div class="ride-info"><div class="ride-info-left">${waitDisplay}${fastPassBadge}${heightInfo}</div><div class="ride-info-right"><span class="family-badge ${classification.class}">${classification.icon} ${classification.label}</span></div></div>${ride.tip ? `<div class="ride-tip" id="tip-${ride.id}" style="display:none"><p>${ride.tip}</p></div>` : ''}<button class="tip-toggle" onclick="app.toggleTip('${ride.id}')">Tip</button>${actionsHtml}`;
+    return card;
+  }
+  function renderRides() {
+    const { pending, done, skipped, closed } = getOptimizedRides();
+    const container = document.getElementById('rides-container'); container.innerHTML = '';
+    container.innerHTML += `<div class="stats-bar"><span>${done.length} ridden</span><span>${pending.length} available</span><span>${skipped.length} skipped</span></div>`;
+    if (pending.length > 0) {
+      const section = document.createElement('div'); section.className = 'section recommended-section'; section.innerHTML = '<h2>Recommended Next</h2>';
+      section.appendChild(createRideCard(pending[0], true));
+      if (pending.length > 1) { const altHeader = document.createElement('p'); altHeader.className = 'alt-header'; altHeader.textContent = 'Also consider:'; section.appendChild(altHeader); pending.slice(1, 3).forEach(r => section.appendChild(createRideCard(r, false))); }
+      container.appendChild(section);
+    }
+    if (pending.length > 3) {
+      const section = document.createElement('div'); section.className = 'section'; section.innerHTML = '<h2>All Available Rides</h2>';
+      const filters = document.createElement('div'); filters.className = 'filter-bar';
+      filters.innerHTML = `<button class="filter-btn active" data-filter="all" onclick="app.filterRides('all')">All</button><button class="filter-btn" data-filter="all-family" onclick="app.filterRides('all-family')">Family</button><button class="filter-btn" data-filter="child-swap" onclick="app.filterRides('child-swap')">Child Swap</button><button class="filter-btn" data-filter="short-wait" onclick="app.filterRides('short-wait')">Short Wait</button>`;
+      section.appendChild(filters);
+      const list = document.createElement('div'); list.id = 'full-ride-list'; pending.slice(3).forEach(r => list.appendChild(createRideCard(r, false))); section.appendChild(list); container.appendChild(section);
+    }
+    if (closed.length > 0) { const section = document.createElement('div'); section.className = 'section closed-section'; section.innerHTML = `<h2>Closed / Down (${closed.length})</h2>`; closed.forEach(r => { section.appendChild(createRideCard({ ...r, classification: classifyRide(r), waitClass: 'wait-unknown' }, false)); }); container.appendChild(section); }
+    if (done.length > 0) { const section = document.createElement('div'); section.className = 'section done-section'; const doneCollapsed = done.length > 3; section.innerHTML = `<h2 onclick="app.toggleSection('done-list')">Completed (${done.length}) ${doneCollapsed ? '\u25BC' : ''}</h2>`; const list = document.createElement('div'); list.id = 'done-list'; if (doneCollapsed) list.style.display = 'none'; done.forEach(r => { list.appendChild(createRideCard({ ...r, classification: classifyRide(r), waitClass: 'wait-unknown' }, false)); }); section.appendChild(list); container.appendChild(section); }
+    if (skipped.length > 0) { const section = document.createElement('div'); section.className = 'section skipped-section'; section.innerHTML = `<h2 onclick="app.toggleSection('skipped-list')">Skipped (${skipped.length}) \u25BC</h2>`; const list = document.createElement('div'); list.id = 'skipped-list'; list.style.display = 'none'; skipped.forEach(r => { list.appendChild(createRideCard({ ...r, classification: classifyRide(r), waitClass: 'wait-unknown' }, false)); }); section.appendChild(list); container.appendChild(section); }
+    renderHeader();
+  }
+  function updateLastFetchDisplay() { const el = document.getElementById('last-fetch'); if (!state.lastFetch) { el.textContent = 'Wait times not loaded'; return; } const mins = Math.floor((Date.now() - state.lastFetch.getTime()) / 60000); el.textContent = mins === 0 ? 'Updated just now' : `Updated ${mins}m ago`; }
+  function switchDay(index) { state.currentDayIndex = index; saveState(); renderDayTabs(); renderRides(); refreshWaitTimes(); }
+  function markRiding(rideId) { state.rides[rideId].status = 'riding'; state.activeRide = rideId; state.activeRideStart = Date.now(); saveState(); renderRides(); showActiveRideBanner(); }
+  function markDone(rideId) { state.rides[rideId].status = 'done'; if (state.activeRide === rideId) { state.activeRide = null; state.activeRideStart = null; hideActiveRideBanner(); } saveState(); renderRides(); }
+  function markSkipped(rideId) { state.rides[rideId].status = 'skipped'; saveState(); renderRides(); }
+  function markPending(rideId) { state.rides[rideId].status = 'pending'; saveState(); renderRides(); }
+  function toggleTip(rideId) { const tip = document.getElementById(`tip-${rideId}`); if (tip) { tip.style.display = tip.style.display === 'none' ? 'block' : 'none'; } }
+  function toggleSection(sectionId) { const section = document.getElementById(sectionId); if (section) { section.style.display = section.style.display === 'none' ? 'block' : 'none'; } }
+  function filterRides(filter) {
+    document.querySelectorAll('.filter-btn').forEach(btn => { btn.classList.toggle('active', btn.dataset.filter === filter); });
+    const list = document.getElementById('full-ride-list'); if (!list) return;
+    list.querySelectorAll('.ride-card').forEach(card => {
+      const ride = state.rides[card.dataset.rideId]; if (!ride) return;
+      const classification = classifyRide(ride); let show = true;
+      switch (filter) { case 'all-family': show = classification.class === 'all-family' || classification.class === 'borderline'; break; case 'child-swap': show = classification.class === 'child-swap' || classification.class === 'older-only'; break; case 'short-wait': show = ride.waitTime != null && ride.waitTime <= 20; break; }
+      card.style.display = show ? 'block' : 'none';
+    });
+  }
+  function showActiveRideBanner() { const banner = document.getElementById('active-ride-banner'); if (!state.activeRide) { banner.style.display = 'none'; return; } const ride = state.rides[state.activeRide]; banner.style.display = 'flex'; banner.innerHTML = `<div class="active-ride-info"><strong>Riding: ${ride.name}</strong><span id="active-timer">0:00</span></div><button class="btn-ride btn-done" onclick="app.markDone('${state.activeRide}')">Done!</button>`; updateActiveTimer(); }
+  function hideActiveRideBanner() { document.getElementById('active-ride-banner').style.display = 'none'; }
+  function updateActiveTimer() { if (!state.activeRide || !state.activeRideStart) return; const elapsed = Math.floor((Date.now() - state.activeRideStart) / 1000); const mins = Math.floor(elapsed / 60); const secs = elapsed % 60; const timer = document.getElementById('active-timer'); if (timer) timer.textContent = `${mins}:${secs.toString().padStart(2, '0')}`; }
+  function showSettings() { const modal = document.getElementById('settings-modal'); const h = getHeights(); document.getElementById('height-older').value = h.older; document.getElementById('height-younger').value = h.younger; modal.style.display = 'flex'; }
+  function hideSettings() { document.getElementById('settings-modal').style.display = 'none'; }
+  function saveSettings() { const older = parseInt(document.getElementById('height-older').value); const younger = parseInt(document.getElementById('height-younger').value); if (older && younger) { state.heightsOverride = { older, younger }; saveState(); renderRides(); } hideSettings(); }
+  function resetDay() { if (!confirm('Reset all ride statuses for this day? This cannot be undone.')) return; const day = CONFIG.days[state.currentDayIndex]; for (const [id, ride] of Object.entries(state.rides)) { if (day.parks.includes(ride.park)) { ride.status = 'pending'; } } saveState(); renderRides(); hideSettings(); }
+  function renderParkToggle() { const day = CONFIG.days[state.currentDayIndex]; const toggleContainer = document.getElementById('park-toggle'); if (day.parks.length <= 1) { toggleContainer.style.display = 'none'; return; } toggleContainer.style.display = 'flex'; toggleContainer.innerHTML = ''; day.parks.forEach(parkKey => { const meta = PARK_META[parkKey]; const btn = document.createElement('button'); btn.className = 'park-toggle-btn active'; btn.textContent = meta ? meta.name : parkKey; btn.dataset.park = parkKey; btn.onclick = () => { btn.classList.toggle('active'); renderRides(); }; toggleContainer.appendChild(btn); }); }
+  async function init() {
+    initializeRides(); loadState(); renderDayTabs(); renderParkToggle(); renderRides();
+    if (Object.keys(state.parkApiIds).length === 0) { await discoverParkIds(); }
+    refreshWaitTimes();
+    state.autoRefreshInterval = setInterval(() => { refreshWaitTimes(); }, 5 * 60 * 1000);
+    setInterval(() => { updateActiveTimer(); updateLastFetchDisplay(); }, 1000);
+    setInterval(() => { renderHeader(); }, 60 * 1000);
+  }
+  window.app = { init, markRiding, markDone, markSkipped, markPending, toggleTip, toggleSection, filterRides, refreshWaitTimes, showSettings, hideSettings, saveSettings, resetDay, switchDay };
+})();
+</script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => app.init());
+</script>
+</body>
+</html>
